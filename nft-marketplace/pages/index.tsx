@@ -1,15 +1,18 @@
-import { NftList } from '@/components';
-import BaseLayout from '@/components/layout/BaseLayout';
+import { NftList } from '@ui';
+import BaseLayout from '@ui/layout/BaseLayout';
 import type { NextPage } from 'next';
 import nfts from '@/content/meta.json'
-import { NftMeta } from '@/types/nft';
+import { NftMeta } from '@_types/nft';
+import { useWeb3 } from '@providers/web3';
 
 
 /* eslint-disable @next/next/no-img-element */
 
 const Home: NextPage = () => {
+  const { ethereum, provider, isLoading, contract } = useWeb3();
   return (
     <BaseLayout>
+      {`Is Loading: ${isLoading}`}
       <div className="relative bg-gray-50 pt-16 pb-20 px-4 sm:px-6 lg:pt-24 lg:pb-28 lg:px-8">
         <div className="absolute inset-0">
           <div className="bg-white h-1/3 sm:h-2/3" />
