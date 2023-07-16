@@ -1,5 +1,5 @@
 import { FunctionComponent, ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
-import { Web3State, createDefaultState, loadContract } from "./utils";
+import { Web3State, createDefaultState, createWeb3State, loadContract } from "./utils";
 import { ethers } from "ethers";
 
 
@@ -19,13 +19,12 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }: Web3Pr
             const provider = new ethers.BrowserProvider(window.ethereum);
             const contract = await loadContract("NftMarket", provider);
 
-            setWeb3Api({
+            setWeb3Api(createWeb3State({
                 ethereum: window.ethereum,
                 provider,
                 contract,
                 isLoading: false
-            })
-
+            }))
         }
 
         initWeb3();
@@ -42,5 +41,9 @@ export function useWeb3() {
     return useContext(Web3Context);
 }
 
+export function useHooks() {
+    const { hooks } = useWeb3();
+    return hooks;
+}
 
 export default Web3Provider;
