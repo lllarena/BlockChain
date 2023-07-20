@@ -17,7 +17,7 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }: Web3Pr
     useEffect(() => {
         async function initWeb3() {
             try {
-                const provider = new ethers.BrowserProvider(window.ethereum as any);
+                const provider = new ethers.providers.Web3Provider(window.ethereum as any);
                 const contract = await loadContract("NftMarket", provider);
 
                 setWeb3Api(createWeb3State({

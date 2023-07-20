@@ -52,7 +52,7 @@ const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export const loadContract = async (
     name: string, //NftMarket
-    provider: ethers.BrowserProvider
+    provider: ethers.providers.Web3Provider
 ): Promise<Contract> => {
 
     if (!NETWORK_ID) {

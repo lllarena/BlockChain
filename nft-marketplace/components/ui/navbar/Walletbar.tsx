@@ -23,7 +23,7 @@ const Walletbar: FunctionComponent<WalletbarProps> = ({
 }) => {
 
     const formatAccount = (account: string) => {
-        return `0x${String(account).slice(2, -4)}....${String(account).slice(-4)}`;
+        return `0x${account[2]}${account[3]}${account[4]}....${account.slice(-4)}`;
     };
 
     if (isLoading) {

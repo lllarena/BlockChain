@@ -4,7 +4,7 @@ import { SWRResponse } from "swr";
 
 
 export type Web3Dependencies = {
-    provider: ethers.BrowserProvider;
+    provider: ethers.providers.Web3Provider;
     contract: Contract;
     ethereum: MetaMaskInpageProvider;
     isLoading: boolean;
