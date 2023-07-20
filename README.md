@@ -11,4 +11,8 @@ URL：http://127.0.0.1:7545
 
 
 
---7.18 连接账户，generic type传参类型有问题
+--7.18 连接账户，generic type传参类型有问题，ethers版本问题
+
+
+
+--7.20 更新mint token，metamask账号可以正常登录，地址正常显示  
