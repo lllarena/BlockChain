@@ -28,6 +28,7 @@ export const hookFactory: AccountHookFactory = ({ provider, ethereum, isLoading 
             return account;
         }, {
         revalidateOnFocus: false,
+        shouldRetryOnError: false,
         onSuccess: (data) => {
             console.log("Account data:", data); // Check if the account data is correctly fetched
         }
@@ -44,9 +45,11 @@ export const hookFactory: AccountHookFactory = ({ provider, ethereum, isLoading 
     const handleAccountsChanged = (...args: unknown[]) => {
         const accounts = args[0] as string[];
         if (accounts.length === 0) {
+            //Real-time refresh when logging out of your account
+            window.location.reload();
             console.error("Please, connect to Web3 wallet");
-        } else if (accounts[0] !== data as any) {
-            mutate(accounts[0] as any);
+        } else if (accounts[0] !== data) {
+            mutate(accounts[0]);
         }
     }
 
@@ -63,7 +66,7 @@ export const hookFactory: AccountHookFactory = ({ provider, ethereum, isLoading 
         ...swr,
         data,
         isValidating,
-        isLoading: isLoading || isValidating,
+        isLoading: isLoading as boolean,
         isInstalled: ethereum?.isMetaMask || false,
         mutate,
         connect
