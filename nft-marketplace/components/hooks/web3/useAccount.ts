@@ -1,6 +1,5 @@
 
 import { CryptoHookFactory } from "@_types/hooks";
-// import { JsonRpcSigner } from "ethers/lib.commonjs/providers";
 import { useEffect } from "react";
 import useSWR from "swr";
 

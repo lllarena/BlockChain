@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NftMarket is ERC721URIStorage, Ownable {
+    //计数器功能来增加增量并获取当前值
     using Counters for Counters.Counter;
 
     struct NftItem {
@@ -15,17 +16,19 @@ contract NftMarket is ERC721URIStorage, Ownable {
         bool isListed;
     }
 
+    //上架价格
     uint public listingPrice = 0.025 ether;
 
-    Counters.Counter private _listedItems;
-    Counters.Counter private _tokenIds;
+    Counters.Counter private _listedItems; //how many items in nft market
+    Counters.Counter private _tokenIds; //how many nfts in total
 
-    mapping(string => bool) private _usedTokenURIs;
+    mapping(string => bool) private _usedTokenURIs; //Check the validity of a URI
     mapping(uint => NftItem) private _idToNftItem;
 
     mapping(address => mapping(uint => uint)) private _ownedTokens;
     mapping(uint => uint) private _idToOwnedIndex;
 
+    //all tokenIds in the array
     uint256[] private _allNfts;
     mapping(uint => uint) private _idToNftIndex;
 
@@ -39,6 +42,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
     constructor() ERC721("CreaturesNFT", "CNFT") {}
 
     function setListingPrice(uint newPrice) external onlyOwner {
+        //管理员设定
         require(newPrice > 0, "Price must be at least 1 wei");
         listingPrice = newPrice;
     }
@@ -73,6 +77,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
     }
 
     function getAllNftsOnSale() public view returns (NftItem[] memory) {
+        //  获取所有在售的Nfts
         uint allItemsCounts = totalSupply();
         uint currentIndex = 0;
         NftItem[] memory items = new NftItem[](_listedItems.current());
@@ -86,11 +91,11 @@ contract NftMarket is ERC721URIStorage, Ownable {
                 currentIndex += 1;
             }
         }
-
         return items;
     }
 
     function getOwnedNfts() public view returns (NftItem[] memory) {
+        //用户可以查询当前调用者所拥有的所有 NFT 的相关信息
         uint ownedItemsCount = ERC721.balanceOf(msg.sender);
         NftItem[] memory items = new NftItem[](ownedItemsCount);
 
@@ -99,8 +104,13 @@ contract NftMarket is ERC721URIStorage, Ownable {
             NftItem storage item = _idToNftItem[tokenId];
             items[i] = item;
         }
+
         return items;
     }
+
+    // function burnToken(uint tokenId) public {
+    //     _burn(tokenId);
+    // }
 
     function mintToken(
         string memory tokenURI,
@@ -112,31 +122,33 @@ contract NftMarket is ERC721URIStorage, Ownable {
             "Price must be equal to listing price"
         );
 
+        //创建新的NFT来创建新的token
         _tokenIds.increment();
         _listedItems.increment();
 
         uint newTokenId = _tokenIds.current();
 
-        _safeMint(msg.sender, newTokenId);
-        _setTokenURI(newTokenId, tokenURI);
+        _safeMint(msg.sender, newTokenId); //创建新的nft
+        _setTokenURI(newTokenId, tokenURI); //给新创建的nft设置uri
         _createNftItem(newTokenId, price);
         _usedTokenURIs[tokenURI] = true;
 
         return newTokenId;
     }
 
+    //Buy Nft function
     function buyNft(uint tokenId) public payable {
         uint price = _idToNftItem[tokenId].price;
         address owner = ERC721.ownerOf(tokenId);
-
-        require(msg.sender != owner, "You already own this NFT");
+        //msg.sender就是creator, 是创建nft的用户
+        require(msg.sender != owner, "You already own this Nft");
         require(msg.value == price, "Please submit the asking price");
 
-        _idToNftItem[tokenId].isListed = false;
+        _idToNftItem[tokenId].isListed = false; //下架
         _listedItems.decrement();
 
-        _transfer(owner, msg.sender, tokenId);
-        payable(owner).transfer(msg.value);
+        _transfer(owner, msg.sender, tokenId); //交易
+        payable(owner).transfer(msg.value); //转账
     }
 
     function placeNftOnSale(uint tokenId, uint newPrice) public payable {
@@ -150,19 +162,17 @@ contract NftMarket is ERC721URIStorage, Ownable {
         );
         require(
             msg.value == listingPrice,
-            "Price must be equal to listing price"
+            "Price must be equal to listingPrice"
         );
 
-        _idToNftItem[tokenId].isListed = true;
+        _idToNftItem[tokenId].isListed = true; //on sale
         _idToNftItem[tokenId].price = newPrice;
         _listedItems.increment();
     }
 
     function _createNftItem(uint tokenId, uint price) private {
         require(price > 0, "Price must be at least 1 wei");
-
         _idToNftItem[tokenId] = NftItem(tokenId, price, msg.sender, true);
-
         emit NftItemCreated(tokenId, price, msg.sender, true);
     }
 
@@ -174,6 +184,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
     ) internal virtual override {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
 
+        // minting token
         if (from == address(0)) {
             _addTokenToAllTokensEnumeration(tokenId);
         } else if (from != to) {
@@ -193,6 +204,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
     }
 
     function _addTokenToOwnerEnumeration(address to, uint tokenId) private {
+        //维护代币所有权的信息
         uint length = ERC721.balanceOf(to);
         _ownedTokens[to][length] = tokenId;
         _idToOwnedIndex[tokenId] = length;

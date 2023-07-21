@@ -1,6 +1,5 @@
 import { FunctionComponent } from "react";
 import NftItem from "../item";
-import { type } from "os";
 import { Nft } from "@/types/nft";
 /*show the nft lists, a <div> represents a list*/
 
