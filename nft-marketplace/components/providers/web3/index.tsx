@@ -2,6 +2,7 @@ import { FunctionComponent, ReactNode, createContext, useCallback, useContext, u
 import { Web3State, createDefaultState, createWeb3State, loadContract } from "./utils";
 import { ethers } from "ethers";
 import { MetaMaskInpageProvider } from "@metamask/providers";
+import { NftMarketContract } from "@_types/nftMarketContract";
 
 
 
@@ -43,7 +44,7 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }: Web3Pr
                 setWeb3Api(createWeb3State({
                     ethereum: window.ethereum,
                     provider,
-                    contract,
+                    contract: contract as unknown as NftMarketContract,
                     isLoading: false
                 }))
             } catch (e: any) {
